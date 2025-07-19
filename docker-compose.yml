@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  kira-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kira-discord-bot
+    restart: unless-stopped
+    
+    env_file:
+      - .env
+    
+    environment:
+      - TZ=Europe/Moscow
+      - JAVA_OPTS=-Xms128m -Xmx512m -XX:+UseG1GC
+    
+    volumes:
+      - ./logs:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+    
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+    
+    restart: unless-stopped
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  log-viewer:
+    image: amir20/dozzle:latest
+    container_name: kira-logs
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DOZZLE_LEVEL=info
+      - DOZZLE_TAILSIZE=300
+    profiles:
+      - monitoring

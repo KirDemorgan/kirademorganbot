@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment
+.env
+.env.example
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+logs/
+*.log
+
+# Maven
+target/
+!target/discord-bot-*.jar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+SETUP.md
+
+# Scripts
+start.bat
+start.sh
+
+# Temporary files
+*.tmp
+*.temp
