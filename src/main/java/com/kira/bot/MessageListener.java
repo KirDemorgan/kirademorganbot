@@ -26,7 +26,6 @@ public class MessageListener extends ListenerAdapter {
     
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        // Ignore bot messages and messages from other channels
         if (event.getAuthor().isBot() || 
             !event.getChannel().getId().equals(targetChannelId)) {
             return;
@@ -37,19 +36,15 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
         
-        // Handle commands first
         if (commandHandler.handleCommand(event, message)) {
             return;
         }
         
-        // Check if Kira should respond to this message
         boolean mentioned = event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser());
         boolean shouldRespond = personality.shouldRespond(message) || mentioned;
         
-        // Respond to most messages in the channel, but with some filtering for spam
         if (!shouldRespond && !personality.isSpamMessage(message)) {
-            // Respond to regular conversation with some probability
-            if (Math.random() < 0.7) { // 70% chance to respond to regular messages
+            if (Math.random() < 0.7) {
                 shouldRespond = true;
             }
         }
@@ -58,10 +53,8 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
         
-        // Show typing indicator
         event.getChannel().sendTyping().queue();
         
-        // Process message asynchronously
         CompletableFuture.supplyAsync(() -> {
             try {
                 String prompt = personality.buildPrompt(message, event.getAuthor().getName());
@@ -73,7 +66,6 @@ public class MessageListener extends ListenerAdapter {
             }
         }).thenAccept(response -> {
             if (response != null && !response.trim().isEmpty()) {
-                // Split long messages if needed
                 if (response.length() > 2000) {
                     String[] parts = splitMessage(response, 2000);
                     for (String part : parts) {
@@ -97,7 +89,6 @@ public class MessageListener extends ListenerAdapter {
             return new String[]{message};
         }
         
-        // Try to split at sentence boundaries
         String[] sentences = message.split("\\. ");
         StringBuilder current = new StringBuilder();
         java.util.List<String> parts = new java.util.ArrayList<>();
@@ -112,7 +103,6 @@ public class MessageListener extends ListenerAdapter {
                     current = new StringBuilder();
                 }
                 
-                // If single sentence is too long, split by words
                 if (sentence.length() > maxLength) {
                     String[] words = sentence.split(" ");
                     for (String word : words) {

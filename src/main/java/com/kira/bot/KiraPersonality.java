@@ -83,10 +83,8 @@ public class KiraPersonality {
     }
     
     public boolean shouldRespond(String message) {
-        // Respond to direct mentions, questions, or code-related keywords
         String lowerMessage = message.toLowerCase();
         
-        // Technical keywords that trigger responses
         String[] techKeywords = {
             "kira", "код", "code", "java", "python", "rust", "javascript", "js",
             "программ", "разработ", "develop", "bug", "error", "ошибка", 
@@ -98,27 +96,23 @@ public class KiraPersonality {
             "rest", "json", "xml", "http", "сервер", "server", "клиент", "client"
         };
         
-        // Question indicators
         String[] questionWords = {
             "?", "как", "что", "почему", "зачем", "где", "когда", "кто",
             "how", "what", "why", "where", "when", "who", "which"
         };
         
-        // Check for technical keywords
         for (String keyword : techKeywords) {
             if (lowerMessage.contains(keyword)) {
                 return true;
             }
         }
         
-        // Check for questions
         for (String question : questionWords) {
             if (lowerMessage.contains(question)) {
                 return true;
             }
         }
         
-        // Check for code patterns (simple heuristic)
         if (lowerMessage.contains("{") || lowerMessage.contains("}") ||
             lowerMessage.contains("function") || lowerMessage.contains("class") ||
             lowerMessage.contains("import") || lowerMessage.contains("def ") ||
@@ -132,12 +126,10 @@ public class KiraPersonality {
     public boolean isSpamMessage(String message) {
         String lowerMessage = message.toLowerCase().trim();
         
-        // Filter out very short messages
         if (lowerMessage.length() < 3) {
             return true;
         }
         
-        // Filter out common spam patterns
         String[] spamPatterns = {
             "lol", "lmao", "xd", "kek", "gg", "ok", "да", "нет", "yes", "no",
             "👍", "👎", "😂", "🤣", "+1", "-1", "f", "rip"
@@ -149,7 +141,6 @@ public class KiraPersonality {
             }
         }
         
-        // Filter out messages that are just emojis or numbers
         if (lowerMessage.matches("^[0-9\\s\\p{So}\\p{Cn}]+$")) {
             return true;
         }

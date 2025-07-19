@@ -19,10 +19,9 @@ public class CommandHandler {
     );
     
     public boolean handleCommand(MessageReceivedEvent event, String message) {
-        // Check if message starts with command prefix (default "!")
         String prefix = System.getenv("BOT_PREFIX");
         if (prefix == null || prefix.isEmpty()) {
-            prefix = "!"; // Default prefix
+            prefix = "!"; 
         }
         
         if (!message.startsWith(prefix)) {

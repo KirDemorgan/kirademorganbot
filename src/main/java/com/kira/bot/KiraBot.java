@@ -16,7 +16,6 @@ public class KiraBot {
     
     public static void main(String[] args) {
         try {
-            // Load environment variables
             Dotenv dotenv = Dotenv.configure()
                     .ignoreIfMissing()
                     .load();
@@ -30,10 +29,8 @@ public class KiraBot {
                 System.exit(1);
             }
             
-            // Initialize Gemini service
             GeminiService geminiService = new GeminiService(geminiApiKey);
             
-            // Build JDA instance
             JDA jda = JDABuilder.createDefault(token)
                     .setActivity(Activity.customStatus("Coding in Java ☕"))
                     .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MESSAGES)

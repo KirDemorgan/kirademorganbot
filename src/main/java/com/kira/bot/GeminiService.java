@@ -67,7 +67,6 @@ public class GeminiService {
         contents.add(content);
         requestBody.add("contents", contents);
         
-        // Add generation config for better responses
         JsonObject generationConfig = new JsonObject();
         generationConfig.addProperty("temperature", 0.7);
         generationConfig.addProperty("topK", 40);
