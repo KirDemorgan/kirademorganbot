@@ -1,17 +1,16 @@
 package com.kira.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
  * Handles Discord message events for Kira bot
  */
+@Slf4j
 public class MessageListener extends ListenerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(MessageListener.class);
     
     private final String targetChannelId;
     private final GeminiService geminiService;
@@ -44,12 +43,19 @@ public class MessageListener extends ListenerAdapter {
         }
         
         // Check if Kira should respond to this message
-        if (!personality.shouldRespond(message)) {
-            // Only respond to direct mentions or specific triggers
-            boolean mentioned = event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser());
-            if (!mentioned) {
-                return;
+        boolean mentioned = event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser());
+        boolean shouldRespond = personality.shouldRespond(message) || mentioned;
+        
+        // Respond to most messages in the channel, but with some filtering for spam
+        if (!shouldRespond && !personality.isSpamMessage(message)) {
+            // Respond to regular conversation with some probability
+            if (Math.random() < 0.7) { // 70% chance to respond to regular messages
+                shouldRespond = true;
             }
+        }
+        
+        if (!shouldRespond) {
+            return;
         }
         
         // Show typing indicator
@@ -61,7 +67,7 @@ public class MessageListener extends ListenerAdapter {
                 String prompt = personality.buildPrompt(message, event.getAuthor().getName());
                 return geminiService.generateResponse(prompt);
             } catch (Exception e) {
-                logger.error("Error generating response for user {}: {}", 
+                log.error("Error generating response for user {}: {}", 
                            event.getAuthor().getName(), e.getMessage());
                 return personality.getErrorResponse();
             }
@@ -76,11 +82,11 @@ public class MessageListener extends ListenerAdapter {
                 } else {
                     event.getChannel().sendMessage(response).queue();
                 }
-                logger.info("Responded to {} in channel {}", 
+                log.info("Responded to {} in channel {}", 
                           event.getAuthor().getName(), event.getChannel().getName());
             }
         }).exceptionally(throwable -> {
-            logger.error("Error sending response", throwable);
+            log.error("Error sending response", throwable);
             event.getChannel().sendMessage(personality.getErrorResponse()).queue();
             return null;
         });

@@ -3,9 +3,8 @@ package com.kira.bot;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -13,9 +12,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Service for interacting with Google Gemini API
  */
+@Slf4j
 public class GeminiService {
-    private static final Logger logger = LoggerFactory.getLogger(GeminiService.class);
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     
     private final OkHttpClient httpClient;
     private final Gson gson;
@@ -35,17 +34,18 @@ public class GeminiService {
         JsonObject requestBody = buildRequestBody(prompt);
         
         Request request = new Request.Builder()
-                .url(GEMINI_API_URL + "?key=" + apiKey)
+                .url(GEMINI_API_URL)
                 .post(RequestBody.create(
                     requestBody.toString(),
                     MediaType.parse("application/json")
                 ))
                 .addHeader("Content-Type", "application/json")
+                .addHeader("X-goog-api-key", apiKey)
                 .build();
         
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                logger.error("Gemini API error: {} - {}", response.code(), response.message());
+                log.error("Gemini API error: {} - {}", response.code(), response.message());
                 throw new IOException("Gemini API request failed: " + response.code());
             }
             
@@ -101,11 +101,11 @@ public class GeminiService {
                 }
             }
             
-            logger.warn("Unexpected response format: {}", responseBody);
+            log.warn("Unexpected response format: {}", responseBody);
             return "Что-то пошло не так с API. Проверь логи.";
             
         } catch (Exception e) {
-            logger.error("Error parsing Gemini response", e);
+            log.error("Error parsing Gemini response", e);
             return "Ошибка парсинга ответа. Типичная проблема с JSON.";
         }
     }

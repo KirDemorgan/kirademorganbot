@@ -1,8 +1,7 @@
 package com.kira.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,8 +9,8 @@ import java.util.List;
 /**
  * Handles bot commands in Kira's style
  */
+@Slf4j
 public class CommandHandler {
-    private static final Logger logger = LoggerFactory.getLogger(CommandHandler.class);
     
     private static final List<String> HELP_RESPONSES = Arrays.asList(
         "Я Kira. Помогаю с кодом и техническими вопросами. Просто спроси что-нибудь.",
@@ -20,7 +19,13 @@ public class CommandHandler {
     );
     
     public boolean handleCommand(MessageReceivedEvent event, String message) {
-        if (!message.startsWith("!")) {
+        // Check if message starts with command prefix (default "!")
+        String prefix = System.getenv("BOT_PREFIX");
+        if (prefix == null || prefix.isEmpty()) {
+            prefix = "!"; // Default prefix
+        }
+        
+        if (!message.startsWith(prefix)) {
             return false;
         }
         
@@ -54,7 +59,7 @@ public class CommandHandler {
     private void handleHelp(MessageReceivedEvent event) {
         String response = HELP_RESPONSES.get((int) (Math.random() * HELP_RESPONSES.size()));
         event.getChannel().sendMessage(response).queue();
-        logger.info("Help command executed by {}", event.getAuthor().getName());
+        log.info("Help command executed by {}", event.getAuthor().getName());
     }
     
     private void handleAbout(MessageReceivedEvent event) {
@@ -69,7 +74,7 @@ public class CommandHandler {
             Помогаю с кодом, архитектурой, отладкой. Без лишних слов, только по делу.
             """;
         event.getChannel().sendMessage(response).queue();
-        logger.info("About command executed by {}", event.getAuthor().getName());
+        log.info("About command executed by {}", event.getAuthor().getName());
     }
     
     private void handleStatus(MessageReceivedEvent event) {
@@ -87,7 +92,7 @@ public class CommandHandler {
             """, uptimeStr, getUsedMemoryMB());
             
         event.getChannel().sendMessage(response).queue();
-        logger.info("Status command executed by {}", event.getAuthor().getName());
+        log.info("Status command executed by {}", event.getAuthor().getName());
     }
     
     private void handlePing(MessageReceivedEvent event) {
@@ -96,7 +101,7 @@ public class CommandHandler {
             long ping = System.currentTimeMillis() - start;
             message.editMessage(String.format("Pong! Задержка: %d ms", ping)).queue();
         });
-        logger.info("Ping command executed by {}", event.getAuthor().getName());
+        log.info("Ping command executed by {}", event.getAuthor().getName());
     }
     
     private static long startTime = System.currentTimeMillis();

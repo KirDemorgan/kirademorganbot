@@ -1,19 +1,18 @@
 package com.kira.bot;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Kira Demorgan Discord Bot
  * A pragmatic AI-powered chat bot with personality
  */
+@Slf4j
 public class KiraBot {
-    private static final Logger logger = LoggerFactory.getLogger(KiraBot.class);
     
     public static void main(String[] args) {
         try {
@@ -27,7 +26,7 @@ public class KiraBot {
             String geminiApiKey = dotenv.get("GEMINI_API_KEY");
             
             if (token == null || channelId == null || geminiApiKey == null) {
-                logger.error("Missing required environment variables. Check your .env file.");
+                log.error("Missing required environment variables. Check your .env file.");
                 System.exit(1);
             }
             
@@ -42,10 +41,10 @@ public class KiraBot {
                     .build();
             
             jda.awaitReady();
-            logger.info("Kira bot is online and ready!");
+            log.info("Kira bot is online and ready!");
             
         } catch (Exception e) {
-            logger.error("Failed to start bot", e);
+            log.error("Failed to start bot", e);
             System.exit(1);
         }
     }

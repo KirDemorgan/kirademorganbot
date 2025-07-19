@@ -128,4 +128,32 @@ public class KiraPersonality {
         
         return false;
     }
+    
+    public boolean isSpamMessage(String message) {
+        String lowerMessage = message.toLowerCase().trim();
+        
+        // Filter out very short messages
+        if (lowerMessage.length() < 3) {
+            return true;
+        }
+        
+        // Filter out common spam patterns
+        String[] spamPatterns = {
+            "lol", "lmao", "xd", "kek", "gg", "ok", "да", "нет", "yes", "no",
+            "👍", "👎", "😂", "🤣", "+1", "-1", "f", "rip"
+        };
+        
+        for (String spam : spamPatterns) {
+            if (lowerMessage.equals(spam)) {
+                return true;
+            }
+        }
+        
+        // Filter out messages that are just emojis or numbers
+        if (lowerMessage.matches("^[0-9\\s\\p{So}\\p{Cn}]+$")) {
+            return true;
+        }
+        
+        return false;
+    }
 }
